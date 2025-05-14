@@ -1,10 +1,14 @@
+# File: workout_tracker/database_models.py
 from flask_sqlalchemy import SQLAlchemy
 
-# Create db instance
 db = SQLAlchemy()
 
-# Define models
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
+    __tablename__ = 'Users Table'
+
+    ID = db.Column(db.Integer, primary_key=True)
+    Username = db.Column(db.String, unique=True, nullable=False)
+    password_hash = db.Column(db.String, nullable=False)
+    Join_date = db.Column(db.String)
+    instructions = db.Column(db.Text)
+    description = db.Column(db.Text)

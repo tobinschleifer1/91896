@@ -1,0 +1,25 @@
+<!-- File: templates/home_page.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main_styles.css') }}">
+</head>
+<body>
+<div class="center">
+    <h1>Welcome, {{ user.Username }}!</h1>
+
+    <p>Here are your available exercises:</p>
+    <ul>
+        {% for ex in exercises %}
+            <li>{{ ex.Name }}: {{ ex.Description }}</li>
+        {% endfor %}
+    </ul>
+
+    <div class="users_signup">
+        <a href="{{ url_for('logout') }}">Log Out</a>
+    </div>
+</div>
+</body>
+</html>

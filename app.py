@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.secret_key = 'super_secret_key'  # TODO: Replace in production
 
 # DB setup
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../91896.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../a.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
@@ -56,16 +56,28 @@ def create_account():
         db.session.add(new_user)
         db.session.commit()
 
-        session['user_id'] = new_user.ID
-        return redirect(url_for('home'))
+        session['user_id'] = new_user.ID  # ✅ store login session
+        return redirect(url_for('home'))  # ✅ go to homepage
 
     return render_template('create_account.html')
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
 
 @app.route('/home')
 def home():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return render_template('home_page.html')
 
-if __name__ == '__main__':
-    app.run(debug=True)
+    user = User.query.get(session['user_id'])
+
+    # Import Exercise model here if you have it
+    from workout_tracker.exercise_data import Exercise
+    exercises = Exercise.query.all()
+
+    return render_template('home_page.html', user=user, exercises=exercises)
+

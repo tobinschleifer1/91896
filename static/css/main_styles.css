@@ -1,0 +1,43 @@
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-container {
+    background: #fff;
+    padding: 40px 30px;
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(60, 72, 88, 0.15);
+    text-align: center;
+}
+
+h1 {
+    color: #2d3a4b;
+    margin-bottom: 24px;
+    font-size: 2.2rem;
+    letter-spacing: 1px;
+}
+
+.log-workouts-btn {
+    background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 16px 36px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 2px 8px rgba(78, 84, 200, 0.15);
+}
+
+.log-workouts-btn:hover {
+    background: linear-gradient(90deg, #8f94fb 0%, #4e54c8 100%);
+    transform: translateY(-2px) scale(1.03);
+}
