@@ -2,18 +2,14 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from workout_tracker.database_models import db, User
 
 def create_app():
-    # Initialize the app
     app = Flask(__name__)
     app.secret_key = 'super_secret_key'  # TODO: Replace in production
 
     # DB setup
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///workout_tracker/91896.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-    # Initialize db with app
     db.init_app(app)
 
-    # Define routes
     @app.route('/')
     def index():
         return redirect(url_for('login'))
@@ -38,6 +34,34 @@ def create_app():
         if 'user_id' not in session:
             return redirect(url_for('login'))
         return render_template('home_page.html')
+
+    @app.route('/create_account', methods=['GET', 'POST'])
+    def create_account():
+        if request.method == 'POST':
+            username = request.form['username']
+            password = request.form['password']
+            password_confirmation = request.form['password_confirmation']
+
+            # Check if passwords match
+            if password != password_confirmation:
+                flash('Passwords do not match')
+                return render_template('create_account.html')
+
+            # Check if username already exists
+            existing_user = User.query.filter_by(username=username).first()
+            if existing_user:
+                flash('Username already exists')
+                return render_template('create_account.html')
+
+            # Create new user
+            new_user = User(username=username, password=password)
+            db.session.add(new_user)
+            db.session.commit()
+
+            flash('Account created successfully! You can now log in.')
+            return redirect(url_for('login'))
+
+        return render_template('create_account.html')
 
     return app
 
