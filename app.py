@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
-app.secret_key = 'super_secret_key'  # TODO: Replace in production
+app.secret_key = 'super_secret_key'  
 
 # DB setup
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../a.db'
