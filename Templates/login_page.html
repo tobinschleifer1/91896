@@ -1,4 +1,3 @@
-<!-- File: Templates/login_page.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +6,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
-
 <div class="center">
     <h1>Login</h1>
 
@@ -24,7 +22,9 @@
             <span></span>
         </div>
 
+        <div class="forgot">Forgot Password?</div>
 
+        <input type="submit" value="Login">
 
         <div class="users_signup">
             Don't have an account? <a href="{{ url_for('create_account') }}">Create one here</a>
@@ -41,6 +41,5 @@
         {% endif %}
     {% endwith %}
 </div>
-
 </body>
 </html>

@@ -1,10 +1,10 @@
-# File: workout_tracker/database_models.py
+# workout_tracker/database_models.py
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
 class User(db.Model):
-    __tablename__ = 'Users Table'
+    __tablename__ = 'Users Table'  # EXACT table name!
 
     ID = db.Column(db.Integer, primary_key=True)
     Username = db.Column(db.String, unique=True, nullable=False)

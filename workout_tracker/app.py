@@ -1,16 +1,23 @@
 # File: workout_tracker/app.py
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-from workout_tracker.database_models import db, User
-from werkzeug.security import generate_password_hash, check_password_hash
 import os
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from database_models import db, User
+from werkzeug.security import generate_password_hash, check_password_hash
 
-app = Flask(__name__)
-app.secret_key = 'super_secret_key'  
+# 🧠 Manually point Flask to correct folders
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+template_dir = os.path.join(base_dir, 'templates')
+static_dir = os.path.join(base_dir, 'static')
 
-# DB setup
+app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+app.secret_key = 'super_secret_key'
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../a.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
+with app.app_context():
+    db.create_all()
+
 
 @app.route('/')
 def index():
@@ -22,13 +29,11 @@ def login():
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(Username=username).first()
-
         if user and check_password_hash(user.password_hash, password):
             session['user_id'] = user.ID
             return redirect(url_for('home'))
         else:
             flash('Invalid username or password')
-
     return render_template('login_page.html')
 
 @app.route('/create_account', methods=['GET', 'POST'])
@@ -56,28 +61,46 @@ def create_account():
         db.session.add(new_user)
         db.session.commit()
 
-        session['user_id'] = new_user.ID  # ✅ store login session
-        return redirect(url_for('home'))  # ✅ go to homepage
+        session['user_id'] = new_user.ID
+        return redirect(url_for('home'))
 
     return render_template('create_account.html')
-
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
-
 
 @app.route('/home')
 def home():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-
     user = User.query.get(session['user_id'])
 
-    # Import Exercise model here if you have it
-    from workout_tracker.exercise_data import Exercise
-    exercises = Exercise.query.all()
+    try:
+        from exercise_data import Exercise
+        exercises = Exercise.query.all()
+    except Exception:
+        exercises = []
 
     return render_template('home_page.html', user=user, exercises=exercises)
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+@app.route('/log_workout', methods=['GET', 'POST'])
+def log_workout():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        # For now just print what was submitted (we’ll store it later)
+        workout_type = request.form['type']
+        duration = request.form['duration']
+        notes = request.form['notes']
+        print("Workout logged:", workout_type, duration, notes)
+        flash('Workout logged successfully!')
+        return redirect(url_for('home'))
+
+    return render_template('log_workout.html')
+
+
+if __name__ == '__main__':
+    print("\n🔥 Flask is running at http://127.0.0.1:5000")
+    app.run(debug=True)

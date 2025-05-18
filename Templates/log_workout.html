@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Log Workout</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main_styles') }}">
+</head>
+<body>
+<div class="center">
+    <h1>Log Your Workout</h1>
+    <form method="POST">
+        <div class="txt_field">
+            <input type="text" name="type" required>
+            <label>Workout Type</label>
+            <span></span>
+        </div>
+
+        <div class="txt_field">
+            <input type="text" name="duration" required>
+            <label>Duration (e.g. 30 min)</label>
+            <span></span>
+        </div>
+
+        <div class="txt_field">
+            <input type="text" name="notes">
+            <label>Notes</label>
+            <span></span>
+        </div>
+
+        <input type="submit" value="Log Workout">
+    </form>
+</div>
+</body>
+</html>
