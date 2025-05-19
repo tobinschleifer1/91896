@@ -25,6 +25,19 @@
         <button style="padding: 10px 20px; font-weight: bold;">Log a Workout</button>
     </a>
 </div>
+<h2>Your Logged Workouts</h2>
+<ul>
+  {% for log, ex in logs %}
+    <li>
+      <strong>{{ log.date_completed }}</strong> - {{ ex.name }}<br>
+      Intensity: {{ log.intensity }} | Duration: {{ log.duration }}<br>
+    </li>
+  {% else %}
+    <li>No workouts logged yet.</li>
+  {% endfor %}
+</ul>
+
+
 
 </div>
 </body>

@@ -12,3 +12,17 @@ class User(db.Model):
     Join_date = db.Column(db.String)
     instructions = db.Column(db.Text)
     description = db.Column(db.Text)
+    
+
+class UserExercise(db.Model):
+    __tablename__ = 'UserExercises'
+
+    ID = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    exercise_id = db.Column(db.Integer, nullable=False)
+    duration = db.Column(db.String)
+    intensity = db.Column(db.String)
+    date_completed = db.Column(db.String)
+    calories_burned = db.Column(db.String)
+
+

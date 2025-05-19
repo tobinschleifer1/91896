@@ -1,10 +1,10 @@
 # File: workout_tracker/app.py
 import os
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database_models import db, User
+from database_models import db, User, UserExercise
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# 🧠 Manually point Flask to correct folders
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 template_dir = os.path.join(base_dir, 'templates')
 static_dir = os.path.join(base_dir, 'static')
@@ -15,9 +15,9 @@ app.secret_key = 'super_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../a.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
+
 with app.app_context():
     db.create_all()
-
 
 @app.route('/')
 def index():
@@ -78,28 +78,64 @@ def home():
     except Exception:
         exercises = []
 
-    return render_template('home_page.html', user=user, exercises=exercises)
+    try:
+        from database_models import Exercise
+        logs = (
+            db.session.query(UserExercise, Exercise)
+            .join(Exercise, UserExercise.exercise_id == Exercise.ID)
+            .filter(UserExercise.user_id == user.ID)
+            .order_by(UserExercise.date_completed.desc())
+            .all()
+        )
+    except Exception:
+        logs = []
+
+    return render_template('home_page.html', user=user, exercises=exercises, logs=logs)
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
+
 @app.route('/log_workout', methods=['GET', 'POST'])
 def log_workout():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        # For now just print what was submitted (we’ll store it later)
-        workout_type = request.form['type']
+        user_id = session['user_id']
+        exercise_names = request.form.getlist('exercise_name[]')
+        sets = request.form.getlist('sets[]')
+        reps = request.form.getlist('reps[]')
+        intensity = request.form['intensity']
         duration = request.form['duration']
         notes = request.form['notes']
-        print("Workout logged:", workout_type, duration, notes)
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M')
+
+        from database_models import Exercise
+
+        for i in range(len(exercise_names)):
+            name = exercise_names[i]
+            exercise = Exercise.query.filter_by(name=name).first()
+            if not exercise:
+                flash(f'Exercise not found: {name}')
+                continue
+
+            log = UserExercise(
+                user_id=user_id,
+                exercise_id=exercise.ID,
+                duration=duration,
+                intensity=intensity,
+                date_completed=timestamp,
+                calories_burned="0"
+            )
+            db.session.add(log)
+
+        db.session.commit()
         flash('Workout logged successfully!')
         return redirect(url_for('home'))
 
     return render_template('log_workout.html')
-
 
 if __name__ == '__main__':
     print("\n🔥 Flask is running at http://127.0.0.1:5000")
