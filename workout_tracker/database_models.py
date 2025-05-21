@@ -15,11 +15,12 @@ class UserExercise(db.Model):
     __tablename__ = 'UserExercises'
     ID = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
-    exercise_id = db.Column(db.Integer, nullable=False)
-    duration = db.Column(db.String)
-    intensity = db.Column(db.String)
-    date_completed = db.Column(db.String)
-    calories_burned = db.Column(db.String)
+    exercise = db.Column(db.String, nullable=False)  # 🔄 was exercise_id
+    duration = db.Column(db.Integer)
+    intensity = db.Column(db.Integer)
+    date_completed = db.Column(db.Integer)
+    calories_burned = db.Column(db.Integer)
+
 
 class Exercise(db.Model):
     __tablename__ = 'Exercises Table'

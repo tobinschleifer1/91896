@@ -74,17 +74,16 @@ def home():
         return redirect(url_for('login'))
 
     user = User.query.get(session['user_id'])
-    exercises = Exercise.query.all()
 
-    logs = (
-        db.session.query(UserExercise, Exercise)
-        .join(Exercise, UserExercise.exercise_id == Exercise.ID)
-        .filter(UserExercise.user_id == user.ID)
+    workouts = (
+        UserExercise.query
+        .filter_by(user_id=user.ID)
         .order_by(UserExercise.date_completed.desc())
         .all()
     )
 
-    return render_template('home_page.html', user=user, exercises=exercises, logs=logs)
+    return render_template('home_page.html', user=user, workouts=workouts)
+
 
 @app.route('/logout')
 def logout():

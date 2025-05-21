@@ -30,13 +30,15 @@
   {% for log in workouts %}
     <li>
       <strong>{{ log.exercise }}</strong><br>
-      Duration: {{ log.duration }} min | Intensity: {{ log.intensity }}<br>
-      Date: {{ log.date_completed | datetimeformat }} | Calories: {{ log.calories_burned }}
+      Duration: {{ log.duration }} mins | Intensity: {{ log.intensity }}<br>
+      Calories: {{ log.calories_burned }}<br>
+      Logged at: {{ log.date_completed | datetimeformat }}
     </li>
   {% else %}
     <li>No workouts logged yet.</li>
   {% endfor %}
 </ul>
+
 
 
 </div>
