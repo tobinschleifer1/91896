@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Log Workout</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main_styles') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main_styles.css') }}">
+    <style>
+        .exercise-row { margin-bottom: 10px; }
+        select, input[type=text], input[type=number] { margin-right: 10px; }
+    </style>
 </head>
 <body>
 <div class="center">
@@ -12,17 +16,18 @@
         <div id="exercises">
             <div class="exercise-row">
                 <input type="text" name="exercise_name[]" placeholder="Exercise Name" required>
+                <input type="number" name="weights[]" placeholder="Weight" min="0" required>
+                <select name="weight_units[]">
+                    <option value="kg">kg</option>
+                    <option value="lbs">lbs</option>
+                </select>
                 <select name="sets[]" required>
                     <option value="" disabled selected>Sets</option>
-                    {% for i in range(1, 11) %}
-                    <option value="{{ i }}">{{ i }}</option>
-                    {% endfor %}
+                    {% for i in range(1, 11) %}<option value="{{ i }}">{{ i }}</option>{% endfor %}
                 </select>
                 <select name="reps[]" required>
                     <option value="" disabled selected>Reps</option>
-                    {% for i in range(1, 31) %}
-                    <option value="{{ i }}">{{ i }}</option>
-                    {% endfor %}
+                    {% for i in range(1, 31) %}<option value="{{ i }}">{{ i }}</option>{% endfor %}
                 </select>
                 <button type="button" class="remove-exercise" onclick="removeExercise(this)" style="display:none;">Remove</button>
             </div>
@@ -32,9 +37,7 @@
         <label for="intensity">Intensity:</label>
         <select name="intensity" id="intensity" required>
             <option value="" disabled selected>Select intensity</option>
-            {% for i in range(1, 11) %}
-            <option value="{{ i }}">{{ i }}</option>
-            {% endfor %}
+            {% for i in range(1, 11) %}<option value="{{ i }}">{{ i }}</option>{% endfor %}
         </select>
         <br><br>
         <label for="duration">Time (minutes):</label>
@@ -51,14 +54,11 @@
         const exercisesDiv = document.getElementById('exercises');
         const firstRow = exercisesDiv.querySelector('.exercise-row');
         const newRow = firstRow.cloneNode(true);
-
-        // Clear values in the cloned row
-        newRow.querySelector('input').value = '';
-        newRow.querySelectorAll('select').forEach(sel => sel.selectedIndex = 0);
-
-        // Show remove button for all but the first row
+        newRow.querySelectorAll('input, select').forEach(el => {
+            if (el.type === 'text' || el.type === 'number') el.value = '';
+            if (el.tagName === 'SELECT') el.selectedIndex = 0;
+        });
         newRow.querySelector('.remove-exercise').style.display = 'inline';
-
         exercisesDiv.appendChild(newRow);
     }
 

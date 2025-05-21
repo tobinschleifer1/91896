@@ -1,10 +1,9 @@
 #cd C:\Users\tobyf\Desktop\91896\workout_tracker
-
 # File: workout_tracker/app.py
 import os
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database_models import db, User, UserExercise, Exercise
+from database_models import db, User, UserExercise
 from werkzeug.security import generate_password_hash, check_password_hash
 
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -20,6 +19,10 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()
+
+@app.template_filter('datetimeformat')
+def datetimeformat(value):
+    return datetime.fromtimestamp(int(value)).strftime('%Y-%m-%d %H:%M')
 
 @app.route('/')
 def index():
@@ -82,8 +85,13 @@ def home():
         .all()
     )
 
-    return render_template('home_page.html', user=user, workouts=workouts)
+    # Group by date_completed to reduce repetition
+    grouped = {}
+    for w in workouts:
+        key = w.date_completed
+        grouped.setdefault(key, {"exercises": [], "meta": w})["exercises"].append(w.exercise)
 
+    return render_template('home_page.html', user=user, grouped_workouts=grouped)
 
 @app.route('/logout')
 def logout():
@@ -100,18 +108,23 @@ def log_workout():
         exercise_names = request.form.getlist('exercise_name[]')
         sets = request.form.getlist('sets[]')
         reps = request.form.getlist('reps[]')
+        weights = request.form.getlist('weights[]')
+        weight_units = request.form.getlist('weight_units[]')
         intensity = int(request.form['intensity'])
         duration = int(request.form['duration'])
         notes = request.form['notes']
-        timestamp = int(datetime.now().timestamp())  # store as integer (Unix time)
+        timestamp = int(datetime.now().timestamp())
 
         for i in range(len(exercise_names)):
             name = exercise_names[i]
-            total_calories = (intensity * duration)  # very basic estimate
+            weight_str = f"{weights[i]} {weight_units[i]}"
+            full_name = f"{name} ({weight_str})"
+
+            total_calories = intensity * duration  # simplistic
 
             log = UserExercise(
                 user_id=user_id,
-                exercise=name,
+                exercise=full_name,
                 duration=duration,
                 intensity=intensity,
                 date_completed=timestamp,
@@ -124,11 +137,6 @@ def log_workout():
         return redirect(url_for('home'))
 
     return render_template('log_workout.html')
-
-@app.template_filter('datetimeformat')
-def datetimeformat(value):
-    return datetime.fromtimestamp(int(value)).strftime('%Y-%m-%d %H:%M')
-
 
 if __name__ == '__main__':
     print("\n🔥 Flask is running at http://127.0.0.1:5000")

@@ -1,46 +1,58 @@
-<!-- File: templates/home_page.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Welcome Home</title>
+    <title>Home Page</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main_styles.css') }}">
+    <style>
+        .workout-entry {
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: #f7f7f7;
+            padding: 10px;
+        }
+        .workout-header {
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+        .workout-details {
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
 <div class="center">
-    <h1>Welcome, {{ user.Username }}!</h1>
+    <h1>Welcome, {{ user.Username }}</h1>
 
-    <p>Here are your available exercises:</p>
-    <ul>
-        {% for ex in exercises %}
-            <li>{{ ex.Name }}: {{ ex.Description }}</li>
+    <h2>Your Logged Workouts</h2>
+    {% if grouped_workouts %}
+        {% for ts, block in grouped_workouts.items() %}
+        <div class="workout-entry">
+            <div class="workout-header" onclick="toggleDetails(this)">
+                Logged at: {{ ts | datetimeformat }}
+            </div>
+            <div class="workout-details">
+                <p>Duration: {{ block.meta.duration }} mins | Intensity: {{ block.meta.intensity }} | Calories: {{ block.meta.calories_burned }}</p>
+                <ul>
+                    {% for ex in block.exercises %}
+                    <li>{{ ex }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
         {% endfor %}
-    </ul>
-
-    <div class="users_signup">
-        <a href="{{ url_for('logout') }}">Log Out</a>
-    </div>
-    <div class="users_signup">
-    <a href="{{ url_for('log_workout') }}">
-        <button style="padding: 10px 20px; font-weight: bold;">Log a Workout</button>
-    </a>
+    {% else %}
+        <p>No workouts logged yet.</p>
+    {% endif %}
 </div>
-<h2>Your Logged Workouts</h2>
-<ul>
-  {% for log in workouts %}
-    <li>
-      <strong>{{ log.exercise }}</strong><br>
-      Duration: {{ log.duration }} mins | Intensity: {{ log.intensity }}<br>
-      Calories: {{ log.calories_burned }}<br>
-      Logged at: {{ log.date_completed | datetimeformat }}
-    </li>
-  {% else %}
-    <li>No workouts logged yet.</li>
-  {% endfor %}
-</ul>
-
-
-
-</div>
+<script>
+function toggleDetails(header) {
+    const detail = header.nextElementSibling;
+    detail.style.display = detail.style.display === 'none' ? 'block' : 'none';
+}
+</script>
 </body>
 </html>
