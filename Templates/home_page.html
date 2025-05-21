@@ -21,11 +21,32 @@
             display: none;
             margin-top: 10px;
         }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .top-bar a {
+            padding: 8px 16px;
+            text-decoration: none;
+            background-color: #2691d9;
+            color: white;
+            border-radius: 4px;
+        }
+        .top-bar a:hover {
+            background-color: #1b7cb2;
+        }
     </style>
 </head>
 <body>
 <div class="center">
-    <h1>Welcome, {{ user.Username }}</h1>
+    <div class="top-bar">
+        <h1>Welcome, {{ user.Username }}</h1>
+        <div>
+            <a href="{{ url_for('log_workout') }}">Log Workout</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
 
     <h2>Your Logged Workouts</h2>
     {% if grouped_workouts %}
