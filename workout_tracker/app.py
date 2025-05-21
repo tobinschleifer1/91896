@@ -1,8 +1,10 @@
+#cd C:\Users\tobyf\Desktop\91896\workout_tracker
+
 # File: workout_tracker/app.py
 import os
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database_models import db, User, UserExercise
+from database_models import db, User, UserExercise, Exercise
 from werkzeug.security import generate_password_hash, check_password_hash
 
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -70,25 +72,17 @@ def create_account():
 def home():
     if 'user_id' not in session:
         return redirect(url_for('login'))
+
     user = User.query.get(session['user_id'])
+    exercises = Exercise.query.all()
 
-    try:
-        from exercise_data import Exercise
-        exercises = Exercise.query.all()
-    except Exception:
-        exercises = []
-
-    try:
-        from database_models import Exercise
-        logs = (
-            db.session.query(UserExercise, Exercise)
-            .join(Exercise, UserExercise.exercise_id == Exercise.ID)
-            .filter(UserExercise.user_id == user.ID)
-            .order_by(UserExercise.date_completed.desc())
-            .all()
-        )
-    except Exception:
-        logs = []
+    logs = (
+        db.session.query(UserExercise, Exercise)
+        .join(Exercise, UserExercise.exercise_id == Exercise.ID)
+        .filter(UserExercise.user_id == user.ID)
+        .order_by(UserExercise.date_completed.desc())
+        .all()
+    )
 
     return render_template('home_page.html', user=user, exercises=exercises, logs=logs)
 
@@ -107,27 +101,22 @@ def log_workout():
         exercise_names = request.form.getlist('exercise_name[]')
         sets = request.form.getlist('sets[]')
         reps = request.form.getlist('reps[]')
-        intensity = request.form['intensity']
-        duration = request.form['duration']
+        intensity = int(request.form['intensity'])
+        duration = int(request.form['duration'])
         notes = request.form['notes']
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M')
-
-        from database_models import Exercise
+        timestamp = int(datetime.now().timestamp())  # store as integer (Unix time)
 
         for i in range(len(exercise_names)):
             name = exercise_names[i]
-            exercise = Exercise.query.filter_by(name=name).first()
-            if not exercise:
-                flash(f'Exercise not found: {name}')
-                continue
+            total_calories = (intensity * duration)  # very basic estimate
 
             log = UserExercise(
                 user_id=user_id,
-                exercise_id=exercise.ID,
+                exercise=name,
                 duration=duration,
                 intensity=intensity,
                 date_completed=timestamp,
-                calories_burned="0"
+                calories_burned=total_calories
             )
             db.session.add(log)
 
@@ -136,6 +125,11 @@ def log_workout():
         return redirect(url_for('home'))
 
     return render_template('log_workout.html')
+
+@app.template_filter('datetimeformat')
+def datetimeformat(value):
+    return datetime.fromtimestamp(int(value)).strftime('%Y-%m-%d %H:%M')
+
 
 if __name__ == '__main__':
     print("\n🔥 Flask is running at http://127.0.0.1:5000")
