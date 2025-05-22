@@ -47,6 +47,14 @@
             <a href="{{ url_for('logout') }}">Logout</a>
         </div>
     </div>
+    {# 
+ This section displays the user's logged workouts.
+It loops through grouped_workouts (workouts grouped by timestamp).
+Each workout shows when it was logged, followed by duration,
+intensity, calories burned, and a list of the exercises logged.
+Clicking the date toggles visibility of the workout details.
+If no workouts exist, a message is shown.
+#}
 
     <h2>Your Logged Workouts</h2>
     {% if grouped_workouts %}

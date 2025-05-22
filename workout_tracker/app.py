@@ -28,6 +28,12 @@ def datetimeformat(value):
 def index():
     return redirect(url_for('login'))
 
+# This route handles the login process for the user.
+# If the method is POST, it checks the submitted username and password
+# against the database. If valid, the user is logged in via session
+# and redirected to the home page. If not, an error is flashed.
+# On GET, it shows the login form.
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -97,6 +103,12 @@ def home():
 def logout():
     session.clear()
     return redirect(url_for('login'))
+
+# 🏋️‍♀️ This route allows a logged-in user to log a workout.
+# It collects multiple exercises with weight, sets, and reps,
+# as well as the workout's intensity, duration, and notes.
+# The workout is saved to the database with a timestamp and
+# the user is redirected back to the home page.
 
 @app.route('/log_workout', methods=['GET', 'POST'])
 def log_workout():

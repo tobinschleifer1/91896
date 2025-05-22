@@ -10,6 +10,14 @@
     </style>
 </head>
 <body>
+    {# 
+ This section renders the workout logging form.
+The user can input multiple exercises, including the name,
+weight, unit (kg/lbs), sets, and reps. Users can add more exercises dynamically.
+Below the exercise list, the form collects session-level data:
+intensity, duration, and optional notes.
+On submit, all data is sent via POST to the log_workout route.
+#}
 <div class="center">
     <h1>Log Your Workout</h1>
     <form method="POST" id="workoutForm">
