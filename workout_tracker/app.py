@@ -1,5 +1,4 @@
 #cd C:\Users\tobyf\Desktop\91896\workout_tracker
-# File: workout_tracker/app.py
 import os
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash
@@ -73,7 +72,8 @@ def create_account():
         db.session.commit()
 
         session['user_id'] = new_user.ID
-        return redirect(url_for('home'))
+        return redirect(url_for('profile_setup'))
+
 
     return render_template('create_account.html')
 
@@ -149,6 +149,23 @@ def log_workout():
         return redirect(url_for('home'))
 
     return render_template('log_workout.html')
+@app.route('/profile_setup', methods=['GET', 'POST'])
+def profile_setup():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+
+    if request.method == 'POST':
+        user.current_weight = request.form.get('current_weight')
+        user.goal_weight = request.form.get('goal_weight')
+        # profile_picture = request.files['profile_picture'] (optional upload handling)
+        db.session.commit()
+        flash("Profile updated successfully!")
+        return redirect(url_for('home'))
+
+    return render_template('profile_setup.html', user=user)
+
 
 if __name__ == '__main__':
     print("\n🔥 Flask is running at http://127.0.0.1:5000")
