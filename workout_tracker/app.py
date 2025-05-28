@@ -163,6 +163,20 @@ def profile_setup():
         db.session.commit()
         flash("Profile updated successfully!")
         return redirect(url_for('home'))
+    try:
+        current = float(request.form.get('current_weight'))
+        goal = float(request.form.get('goal_weight'))
+
+        if not (0 < current <= 300 and 0 < goal <= 300):
+            flash('Weight must be between 0 and 300 kg.')
+            return redirect(url_for('profile_setup'))
+
+        user.current_weight = current
+        user.goal_weight = goal
+    except ValueError:
+        flash('Invalid number input.')
+        return redirect(url_for('profile_setup'))
+
 
     return render_template('profile_setup.html', user=user)
 

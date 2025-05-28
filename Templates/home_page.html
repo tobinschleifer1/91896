@@ -69,6 +69,15 @@ If no workouts exist, a message is shown.
                     {% for ex in block.exercises %}
                     <li>{{ ex }}</li>
                     {% endfor %}
+    {% if user.current_weight and user.goal_weight %}
+<div style="margin: 1rem 0;">
+  <label>Weight Progress: {{ user.current_weight }}kg → {{ user.goal_weight }}kg</label>
+    <div style="background: #ccc; height: 20px; border-radius: 5px; overflow: hidden;">
+    <div style="background: #2691d9; width: {{ ((user.current_weight / user.goal_weight) * 100) if user.goal_weight else 0 }}%; height: 100%;"></div>
+  </div>
+</div>
+{% endif %}
+
                 </ul>
             </div>
         </div>
