@@ -71,6 +71,10 @@ def create_account():
         db.session.add(new_user)
         db.session.commit()
 
+        recovery_phrase = request.form['recovery_phrase']
+        new_user = User(Username=username, password_hash=hashed_password, recovery_phrase=recovery_phrase)
+
+
         session['user_id'] = new_user.ID
         return redirect(url_for('profile_setup'))
 
