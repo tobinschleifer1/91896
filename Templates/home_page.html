@@ -44,17 +44,19 @@
         <h1>Welcome, {{ user.Username }}</h1>
         <div>
             <a href="{{ url_for('log_workout') }}">Log Workout</a>
+            <a href="{{ url_for('profile_setup') }}">Set Goals</a>
             <a href="{{ url_for('logout') }}">Logout</a>
         </div>
     </div>
-    {# 
- This section displays the user's logged workouts.
-It loops through grouped_workouts (workouts grouped by timestamp).
-Each workout shows when it was logged, followed by duration,
-intensity, calories burned, and a list of the exercises logged.
-Clicking the date toggles visibility of the workout details.
-If no workouts exist, a message is shown.
-#}
+
+    {% if user.current_weight and user.goal_weight %}
+    <div style="margin: 1rem 0;">
+        <label>Weight Progress: {{ user.current_weight }}kg → {{ user.goal_weight }}kg</label>
+        <div style="background: #ccc; height: 20px; border-radius: 5px; overflow: hidden;">
+            <div style="background: #2691d9; width: {{ ((user.current_weight / user.goal_weight) * 100) if user.goal_weight else 0 }}%; height: 100%;"></div>
+        </div>
+    </div>
+    {% endif %}
 
     <h2>Your Logged Workouts</h2>
     {% if grouped_workouts %}
@@ -69,15 +71,6 @@ If no workouts exist, a message is shown.
                     {% for ex in block.exercises %}
                     <li>{{ ex }}</li>
                     {% endfor %}
-    {% if user.current_weight and user.goal_weight %}
-<div style="margin: 1rem 0;">
-  <label>Weight Progress: {{ user.current_weight }}kg → {{ user.goal_weight }}kg</label>
-    <div style="background: #ccc; height: 20px; border-radius: 5px; overflow: hidden;">
-    <div style="background: #2691d9; width: {{ ((user.current_weight / user.goal_weight) * 100) if user.goal_weight else 0 }}%; height: 100%;"></div>
-  </div>
-</div>
-{% endif %}
-
                 </ul>
             </div>
         </div>

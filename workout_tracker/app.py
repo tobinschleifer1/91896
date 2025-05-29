@@ -153,6 +153,7 @@ def log_workout():
         return redirect(url_for('home'))
 
     return render_template('log_workout.html')
+
 @app.route('/profile_setup', methods=['GET', 'POST'])
 def profile_setup():
     if 'user_id' not in session:
@@ -161,28 +162,47 @@ def profile_setup():
     user = User.query.get(session['user_id'])
 
     if request.method == 'POST':
-        user.current_weight = request.form.get('current_weight')
-        user.goal_weight = request.form.get('goal_weight')
-        # profile_picture = request.files['profile_picture'] (optional upload handling)
-        db.session.commit()
-        flash("Profile updated successfully!")
-        return redirect(url_for('home'))
-    try:
-        current = float(request.form.get('current_weight'))
-        goal = float(request.form.get('goal_weight'))
+        try:
+            current = float(request.form.get('current_weight'))
+            goal = float(request.form.get('goal_weight'))
 
-        if not (0 < current <= 300 and 0 < goal <= 300):
-            flash('Weight must be between 0 and 300 kg.')
+            if not (0 < current <= 300 and 0 < goal <= 300):
+                flash('Weight must be between 0 and 300 kg.')
+                return redirect(url_for('profile_setup'))
+
+            user.current_weight = current
+            user.goal_weight = goal
+            db.session.commit()
+            flash("Profile updated successfully!")
+            return redirect(url_for('home'))
+
+        except ValueError:
+            flash('Invalid number input.')
             return redirect(url_for('profile_setup'))
 
-        user.current_weight = current
-        user.goal_weight = goal
-    except ValueError:
-        flash('Invalid number input.')
-        return redirect(url_for('profile_setup'))
-
-
     return render_template('profile_setup.html', user=user)
+
+@app.route('/update_profile', methods=['POST'])
+def update_profile():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+
+    try:
+        user.current_weight = float(request.form['current_weight'])
+        user.goal_weight = float(request.form['goal_weight'])
+
+        if not (0 < user.current_weight <= 300 and 0 < user.goal_weight <= 300):
+            flash('Weight must be between 0 and 300 kg.')
+            return redirect(url_for('home'))
+
+        db.session.commit()
+        flash("Profile updated successfully!")
+    except ValueError:
+        flash("Invalid weight input.")
+    return redirect(url_for('home'))
+
 
 
 if __name__ == '__main__':
