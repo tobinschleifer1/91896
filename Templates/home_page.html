@@ -24,6 +24,7 @@
         .top-bar {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
         }
         .top-bar a {
@@ -32,15 +33,34 @@
             background-color: #2691d9;
             color: white;
             border-radius: 4px;
+            margin-left: 8px;
         }
         .top-bar a:hover {
             background-color: #1b7cb2;
+        }
+        .profile-icon {
+            margin-right: auto;
+            padding: 10px;
+        }
+        .profile-icon a {
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: #2691d9;
+        }
+        .goals-info {
+            margin: 20px 0;
+            padding: 15px;
+            background: #eef;
+            border-radius: 6px;
         }
     </style>
 </head>
 <body>
 <div class="center">
     <div class="top-bar">
+        <div class="profile-icon">
+            <a href="{{ url_for('profile_settings') }}" title="Edit Profile">👤</a>
+        </div>
         <h1>Welcome, {{ user.Username }}</h1>
         <div>
             <a href="{{ url_for('log_workout') }}">Log Workout</a>
@@ -50,8 +70,10 @@
     </div>
 
     {% if user.current_weight and user.goal_weight %}
-    <div style="margin: 1rem 0;">
-        <label>Weight Progress: {{ user.current_weight }}kg → {{ user.goal_weight }}kg</label>
+    <div class="goals-info">
+        <p><strong>Current Weight:</strong> {{ user.current_weight }}kg</p>
+        <p><strong>Goal Weight:</strong> {{ user.goal_weight }}kg</p>
+        <p><strong>Last Updated:</strong> {{ user.weight_updated.strftime('%Y-%m-%d %H:%M') if user.weight_updated else 'N/A' }}</p>
         <div style="background: #ccc; height: 20px; border-radius: 5px; overflow: hidden;">
             <div style="background: #2691d9; width: {{ ((user.current_weight / user.goal_weight) * 100) if user.goal_weight else 0 }}%; height: 100%;"></div>
         </div>

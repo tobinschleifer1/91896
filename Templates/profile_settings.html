@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile Settings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main_styles.css') }}">
+</head>
+<body>
+<div class="center">
+    <h1>Profile Settings</h1>
+    <form method="POST">
+        <div class="txt_field">
+            <input type="password" name="new_password" required>
+            <label>New Password</label>
+            <span></span>
+        </div>
+        <div class="txt_field">
+            <input type="password" name="confirm_password" required>
+            <label>Confirm Password</label>
+            <span></span>
+        </div>
+        <!-- Optional: file upload -->
+        <!-- <input type="file" name="profile_picture"> -->
+        <input type="submit" value="Update Settings">
+    </form>
+    <div class="users_signup">
+        <a href="{{ url_for('home') }}">Back to Home</a>
+    </div>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="error">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+</div>
+</body>
+</html>
