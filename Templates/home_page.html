@@ -64,7 +64,6 @@
         <h1>Welcome, {{ user.Username }}</h1>
         <div>
             <a href="{{ url_for('log_workout') }}">Log Workout</a>
-            <a href="{{ url_for('profile_setup') }}">Set Goals</a>
             <a href="{{ url_for('logout') }}">Logout</a>
         </div>
     </div>
@@ -87,9 +86,7 @@
     <div style="width: {{ (user.current_weight / user.goal_weight * 100)|round(1) }}%; background:#2691d9; height:100%"></div>
   </div>
 {% endif %}
-{% if not user.current_weight %}
-  <p><strong>You haven’t set any goals yet!</strong> <a href="{{ url_for('profile_setup') }}">Click here to set goals</a></p>
-{% endif %}
+
 
 
     <h2>Your Logged Workouts</h2>

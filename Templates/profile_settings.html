@@ -3,38 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <title>Profile Settings</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main_styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            <script> function confirmUpdate() {return confirm('Are you sure you want to update your profile?');}
+</script>
+
+        }
+        .top-nav {
+            background-color: #2691d9;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .top-nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .container h2 {
+            color: #2691d9;
+            margin-bottom: 15px;
+        }
+        .container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .container button {
+            background: #2691d9;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .container button:hover {
+            background: #1b7cb2;
+        }
+        .messages {
+            color: red;
+        }
+    </style>
 </head>
 <body>
-<div class="center">
-    <h1>Profile Settings</h1>
+
+<div class="top-nav">
+    <a href="{{ url_for('home') }}">🏠 Back to Home</a>
+</div>
+
+<div class="container">
     <form method="POST">
-        <div class="txt_field">
-            <input type="password" name="new_password" required>
-            <label>New Password</label>
-            <span></span>
-        </div>
-        <div class="txt_field">
-            <input type="password" name="confirm_password" required>
-            <label>Confirm Password</label>
-            <span></span>
-        </div>
-        <!-- Optional: file upload -->
-        <!-- <input type="file" name="profile_picture"> -->
-        <input type="submit" value="Update Settings">
+        <h2>Change Password</h2>
+        <input type="password" name="new_password" placeholder="New Password">
+        <input type="password" name="confirm_password" placeholder="Confirm Password">
+
+        <h2>Set Workout Goals</h2>
+
+        <!-- Bench -->
+        <input type="number" name="bench_current" value="{{ user.bench_current or '' }}" placeholder="Current Bench Press (kg)">
+        <input type="number" name="bench_goal" value="{{ user.bench_goal or '' }}" placeholder="Bench Press Goal (kg)">
+
+        <!-- Squat -->
+        <input type="number" name="squat_current" value="{{ user.squat_current or '' }}" placeholder="Current Squat (kg)">
+        <input type="number" name="squat_goal" value="{{ user.squat_goal or '' }}" placeholder="Squat Goal (kg)">
+
+        <!-- Deadlift -->
+        <input type="number" name="deadlift_current" value="{{ user.deadlift_current or '' }}" placeholder="Current Deadlift (kg)">
+        <input type="number" name="deadlift_goal" value="{{ user.deadlift_goal or '' }}" placeholder="Deadlift Goal (kg)">
+
+        <button type="submit">Update Profile</button>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% if user.bench_goal %}
+  <p><strong>Bench Press Progress:</strong> {{ user.bench_goal }} kg</p>
+  <div style="background: #ccc; height: 20px; border-radius: 5px; overflow: hidden;">
+      <div style="background: #4CAF50; width: 100%; height: 100%;"></div>
+  </div>
+{% endif %}
+
+{% if user.squat_goal %}
+  <p><strong>Squat Goal:</strong> {{ user.squat_goal }} kg</p>
+  <div style="background: #ccc; height: 20px; border-radius: 5px; overflow: hidden;">
+      <div style="background: #FF9800; width: 100%; height: 100%;"></div>
+  </div>
+{% endif %}
+
+{% if user.deadlift_goal %}
+  <p><strong>Deadlift Goal:</strong> {{ user.deadlift_goal }} kg</p>
+  <div style="background: #ccc; height: 20px; border-radius: 5px; overflow: hidden;">
+      <div style="background: #F44336; width: 100%; height: 100%;"></div>
+  </div>
+{% endif %}
+onsubmit="return confirmUpdate()"
+
     </form>
-    <div class="users_signup">
-        <a href="{{ url_for('home') }}">Back to Home</a>
-    </div>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul class="error">
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
+
 </div>
 </body>
 </html>

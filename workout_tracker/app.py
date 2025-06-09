@@ -139,6 +139,7 @@ def log_workout():
         return redirect(url_for('home'))
 
     return render_template('log_workout.html')
+
 @app.route('/profile_settings', methods=['GET', 'POST'])
 def profile_settings():
     if 'user_id' not in session:
@@ -147,23 +148,46 @@ def profile_settings():
     user = User.query.get(session['user_id'])
 
     if request.method == 'POST':
-        new_password = request.form['new_password']
-        confirm_password = request.form['confirm_password']
+        # Password update
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
 
-        if new_password != confirm_password:
-            flash("Passwords do not match.")
-            return redirect(url_for('profile_settings'))
+        if new_password and confirm_password:
+            if new_password == confirm_password:
+                if len(new_password) >= 6:
+                    user.password_hash = generate_password_hash(new_password)
+                else:
+                    flash("Password must be at least 6 characters.")
+            else:
+                flash("Passwords do not match.")
 
-        if len(new_password) < 6:
-            flash("Password must be at least 6 characters.")
-            return redirect(url_for('profile_settings'))
+        # Goal updates with safe parsing
+        def try_parse_float(field):  # Safe float parsing
+            try:
+                return float(request.form.get(field))
+            except (TypeError, ValueError):
+                return None
 
-        user.password_hash = generate_password_hash(new_password)
+        user.bench_goal = try_parse_float('bench_goal')
+        user.squat_goal = try_parse_float('squat_goal')
+        user.deadlift_goal = try_parse_float('deadlift_goal')
+        user.current_weight = try_parse_float('current_weight')
+        user.goal_weight = try_parse_float('goal_weight')
+        user.bench_current = try_parse_float('bench_current')
+        user.squat_current = try_parse_float('squat_current')
+        user.deadlift_current = try_parse_float('deadlift_current')
+
+
+        if user.current_weight and user.goal_weight:
+            user.weight_updated = datetime.now().strftime('%Y-%m-%d %H:%M')
+
         db.session.commit()
-        flash("Password updated successfully.")
-        return redirect(url_for('home'))
+        flash("Profile updated successfully.")
+        return redirect(url_for('profile_settings'))
 
     return render_template('profile_settings.html', user=user)
+
+
 
 
 @app.route('/profile_setup', methods=['GET', 'POST'])

@@ -10,6 +10,14 @@ class User(db.Model):
     Join_date = db.Column(db.String)
     instructions = db.Column(db.Text)
     description = db.Column(db.Text)
+    bench_goal = db.Column(db.Integer)
+    squat_goal = db.Column(db.Integer)
+    deadlift_goal = db.Column(db.Integer)
+    bench_current = db.Column(db.Integer)
+    squat_current = db.Column(db.Integer)
+    deadlift_current = db.Column(db.Integer)
+
+
 
 class UserExercise(db.Model):
     __tablename__ = 'UserExercises'
