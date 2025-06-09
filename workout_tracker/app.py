@@ -1,4 +1,4 @@
-#cd C:\Users\tobyf\Desktop\91896\workout_tracker
+# cd C:\Users\tobyf\Desktop\91896\workout_tracker
 import os
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash
@@ -27,12 +27,6 @@ def datetimeformat(value):
 def index():
     return redirect(url_for('login'))
 
-# This route handles the login process for the user.
-# If the method is POST, it checks the submitted username and password
-# against the database. If valid, the user is logged in via session
-# and redirected to the home page. If not, an error is flashed.
-# On GET, it shows the login form.
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -52,6 +46,7 @@ def create_account():
         username = request.form['username']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
+        recovery_phrase = request.form['recovery_phrase']
 
         if len(password) < 6:
             flash('Password must be at least 6 characters long')
@@ -67,17 +62,12 @@ def create_account():
             return redirect(url_for('create_account'))
 
         hashed_password = generate_password_hash(password)
-        new_user = User(Username=username, password_hash=hashed_password)
+        new_user = User(Username=username, password_hash=hashed_password, recovery_phrase=recovery_phrase)
         db.session.add(new_user)
         db.session.commit()
 
-        recovery_phrase = request.form['recovery_phrase']
-        new_user = User(Username=username, password_hash=hashed_password, recovery_phrase=recovery_phrase)
-
-
         session['user_id'] = new_user.ID
         return redirect(url_for('profile_setup'))
-
 
     return render_template('create_account.html')
 
@@ -95,7 +85,6 @@ def home():
         .all()
     )
 
-    # Group by date_completed to reduce repetition
     grouped = {}
     for w in workouts:
         key = w.date_completed
@@ -107,12 +96,6 @@ def home():
 def logout():
     session.clear()
     return redirect(url_for('login'))
-
-# 🏋️‍♀️ This route allows a logged-in user to log a workout.
-# It collects multiple exercises with weight, sets, and reps,
-# as well as the workout's intensity, duration, and notes.
-# The workout is saved to the database with a timestamp and
-# the user is redirected back to the home page.
 
 @app.route('/log_workout', methods=['GET', 'POST'])
 def log_workout():
@@ -136,7 +119,7 @@ def log_workout():
             weight_str = f"{weights[i]} {weight_units[i]}"
             full_name = f"{name} ({weight_str})"
 
-            total_calories = intensity * duration  # simplistic
+            total_calories = intensity * duration
 
             log = UserExercise(
                 user_id=user_id,
@@ -144,8 +127,11 @@ def log_workout():
                 duration=duration,
                 intensity=intensity,
                 date_completed=timestamp,
-                calories_burned=total_calories
-            )
+                calories_burned=total_calories,
+                notes=notes  # ✅ include notes
+)
+
+            
             db.session.add(log)
 
         db.session.commit()
@@ -153,8 +139,32 @@ def log_workout():
         return redirect(url_for('home'))
 
     return render_template('log_workout.html')
+@app.route('/profile_settings', methods=['GET', 'POST'])
+def profile_settings():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
 
-from datetime import datetime
+    user = User.query.get(session['user_id'])
+
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+
+        if new_password != confirm_password:
+            flash("Passwords do not match.")
+            return redirect(url_for('profile_settings'))
+
+        if len(new_password) < 6:
+            flash("Password must be at least 6 characters.")
+            return redirect(url_for('profile_settings'))
+
+        user.password_hash = generate_password_hash(new_password)
+        db.session.commit()
+        flash("Password updated successfully.")
+        return redirect(url_for('home'))
+
+    return render_template('profile_settings.html', user=user)
+
 
 @app.route('/profile_setup', methods=['GET', 'POST'])
 def profile_setup():
@@ -174,7 +184,7 @@ def profile_setup():
 
             user.current_weight = current
             user.goal_weight = goal
-            user.weight_updated = datetime.now().strftime('%Y-%m-%d %H:%M')  # ⏰ Store timestamp
+            user.weight_updated = datetime.now().strftime('%Y-%m-%d %H:%M')
             db.session.commit()
             flash("Profile updated successfully!")
             return redirect(url_for('home'))
@@ -184,7 +194,6 @@ def profile_setup():
             return redirect(url_for('profile_setup'))
 
     return render_template('profile_setup.html', user=user)
-
 
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
@@ -201,39 +210,12 @@ def update_profile():
             flash('Weight must be between 0 and 300 kg.')
             return redirect(url_for('home'))
 
+        user.weight_updated = datetime.now().strftime('%Y-%m-%d %H:%M')
         db.session.commit()
         flash("Profile updated successfully!")
     except ValueError:
         flash("Invalid weight input.")
     return redirect(url_for('home'))
-
-@app.route('/profile_setup', methods=['GET', 'POST'])
-def profile_setup():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-
-    user = User.query.get(session['user_id'])
-
-    if request.method == 'POST':
-        try:
-            current = float(request.form.get('current_weight'))
-            goal = float(request.form.get('goal_weight'))
-
-            if not (0 < current <= 300 and 0 < goal <= 300):
-                flash('Weight must be between 0 and 300 kg.')
-                return redirect(url_for('profile_setup'))
-
-            user.current_weight = current
-            user.goal_weight = goal
-            db.session.commit()
-            flash("Profile updated successfully!")
-            return redirect(url_for('home'))
-
-        except ValueError:
-            flash('Invalid number input.')
-            return redirect(url_for('profile_setup'))
-
-    return render_template('profile_setup.html', user=user)
 
 if __name__ == '__main__':
     print("\n🔥 Flask is running at http://127.0.0.1:5000")

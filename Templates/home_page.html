@@ -79,6 +79,18 @@
         </div>
     </div>
     {% endif %}
+    {% if user.current_weight and user.goal_weight %}
+  <p>Current Weight: {{ user.current_weight }}kg</p>
+  <p>Goal Weight: {{ user.goal_weight }}kg</p>
+  <p>Last Updated: {{ user.weight_updated }}</p>
+  <div style="background:#ddd;width:100%;height:20px;border-radius:5px;overflow:hidden">
+    <div style="width: {{ (user.current_weight / user.goal_weight * 100)|round(1) }}%; background:#2691d9; height:100%"></div>
+  </div>
+{% endif %}
+{% if not user.current_weight %}
+  <p><strong>You haven’t set any goals yet!</strong> <a href="{{ url_for('profile_setup') }}">Click here to set goals</a></p>
+{% endif %}
+
 
     <h2>Your Logged Workouts</h2>
     {% if grouped_workouts %}
@@ -88,11 +100,13 @@
                 Logged at: {{ ts | datetimeformat }}
             </div>
             <div class="workout-details">
-                <p>Duration: {{ block.meta.duration }} mins | Intensity: {{ block.meta.intensity }} | Calories: {{ block.meta.calories_burned }}</p>
-                <ul>
-                    {% for ex in block.exercises %}
-                    <li>{{ ex }}</li>
-                    {% endfor %}
+                <p>Duration: {{ block.meta.duration }} mins |
+                    Intensity: {{ block.meta.intensity }} |
+                    Calories: {{ block.meta.calories_burned }}</p>
+
+                    {% if block.meta.notes %}
+                        <p><strong>Notes:</strong> {{ block.meta.notes }}</p>
+                {% endif %}
                 </ul>
             </div>
         </div>

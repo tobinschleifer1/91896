@@ -20,6 +20,8 @@ class UserExercise(db.Model):
     intensity = db.Column(db.Integer)
     date_completed = db.Column(db.Integer)
     calories_burned = db.Column(db.Integer)
+    notes = db.Column(db.Text)  # Add this line inside the class
+
 
 
 class Exercise(db.Model):
