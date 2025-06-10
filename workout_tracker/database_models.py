@@ -16,6 +16,7 @@ class User(db.Model):
     bench_current = db.Column(db.Integer)
     squat_current = db.Column(db.Integer)
     deadlift_current = db.Column(db.Integer)
+    recovery_phrase = db.Column(db.Text)
 
 
 
