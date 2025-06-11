@@ -9,6 +9,7 @@
         select, input[type=text], input[type=number] { margin-right: 10px; }
     </style>
 </head>
+
 <body>
     {# 
  This section renders the workout logging form.
@@ -18,6 +19,9 @@ Below the exercise list, the form collects session-level data:
 intensity, duration, and optional notes.
 On submit, all data is sent via POST to the log_workout route.
 #}
+<div class="top-nav">
+    <a href="{{ url_for('home') }}"> Back to Home</a>
+</div>
 <div class="center">
     <h1>Log Your Workout</h1>
     <form method="POST" id="workoutForm">

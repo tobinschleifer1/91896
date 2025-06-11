@@ -67,7 +67,7 @@ def create_account():
         db.session.commit()
 
         session['user_id'] = new_user.ID
-        return redirect(url_for('profile_setup'))
+        return redirect(url_for('profile_settings'))
 
     return render_template('create_account.html')
 
@@ -103,42 +103,53 @@ def log_workout():
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        user_id = session['user_id']
-        exercise_names = request.form.getlist('exercise_name[]')
-        sets = request.form.getlist('sets[]')
-        reps = request.form.getlist('reps[]')
-        weights = request.form.getlist('weights[]')
-        weight_units = request.form.getlist('weight_units[]')
-        intensity = int(request.form['intensity'])
-        duration = int(request.form['duration'])
-        notes = request.form['notes']
-        timestamp = int(datetime.now().timestamp())
+        try:
+            user_id = session['user_id']
+            exercise_names = request.form.getlist('exercise_name[]')
+            sets = list(map(int, request.form.getlist('sets[]')))
+            reps = list(map(int, request.form.getlist('reps[]')))
+            weights = list(map(float, request.form.getlist('weights[]')))
+            weight_units = request.form.getlist('weight_units[]')
+            intensity = int(request.form['intensity'])
+            duration = int(request.form['duration'])
+            notes = request.form['notes']
+            timestamp = int(datetime.now().timestamp())
 
-        for i in range(len(exercise_names)):
-            name = exercise_names[i]
-            weight_str = f"{weights[i]} {weight_units[i]}"
-            full_name = f"{name} ({weight_str})"
+            # 🛑 Basic validation
+            if not (1 <= duration <= 300):
+                flash("Workout duration must be between 1 and 300 minutes.")
+                return redirect(url_for('log_workout'))
+            if not all(1 <= w <= 500 for w in weights):
+                flash("Weight per exercise must be between 1 and 500.")
+                return redirect(url_for('log_workout'))
 
-            total_calories = intensity * duration
+            for i in range(len(exercise_names)):
+                name = exercise_names[i]
+                weight_str = f"{weights[i]} {weight_units[i]}"
+                full_name = f"{name} ({weight_str})"
+                total_calories = intensity * duration
 
-            log = UserExercise(
-                user_id=user_id,
-                exercise=full_name,
-                duration=duration,
-                intensity=intensity,
-                date_completed=timestamp,
-                calories_burned=total_calories,
-                notes=notes  # ✅ include notes
-)
+                log = UserExercise(
+                    user_id=user_id,
+                    exercise=full_name,
+                    duration=duration,
+                    intensity=intensity,
+                    date_completed=timestamp,
+                    calories_burned=total_calories,
+                    notes=notes
+                )
+                db.session.add(log)
 
-            
-            db.session.add(log)
+            db.session.commit()
+            flash("Workout logged successfully!")
+            return redirect(url_for('home'))
 
-        db.session.commit()
-        flash('Workout logged successfully!')
-        return redirect(url_for('home'))
+        except Exception as e:
+            flash(f"Error logging workout: {str(e)}")
+            return redirect(url_for('log_workout'))
 
     return render_template('log_workout.html')
+
 
 @app.route('/profile_settings', methods=['GET', 'POST'])
 def profile_settings():
@@ -184,6 +195,20 @@ def profile_settings():
         db.session.commit()
         flash("Profile updated successfully.")
         return redirect(url_for('profile_settings'))
+    for field in ['current_weight', 'goal_weight', 'bench_goal', 'squat_goal', 'deadlift_goal',
+              'bench_current', 'squat_current', 'deadlift_current']:
+        val = request.form.get(field)
+        if val:
+            try:
+                parsed = float(val)
+                if parsed < 0 or parsed > 500:
+                    flash(f"{field.replace('_', ' ').title()} must be between 0–500.")
+                    return redirect(url_for('profile_settings'))
+                setattr(user, field, parsed)
+            except ValueError:
+                flash(f"{field.replace('_', ' ').title()} must be a number.")
+                return redirect(url_for('profile_settings'))
+
 
     return render_template('profile_settings.html', user=user)
 
