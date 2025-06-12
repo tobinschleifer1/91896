@@ -157,11 +157,13 @@ def profile_settings():
         return redirect(url_for('login'))
 
     user = User.query.get(session['user_id'])
+    print(user)
 
     if request.method == 'POST':
         try:
             # Save weight fields
             user.current_weight = float(request.form['current_weight'])
+            print("before", request.form['current_weight'])
             user.goal_weight = float(request.form['goal_weight'])
             user.weight_updated = datetime.now().strftime('%Y-%m-%d %H:%M')
 
@@ -175,10 +177,15 @@ def profile_settings():
 
             db.session.commit()
             flash("Profile updated successfully!")
+            print("after", request.form['current_weight'])
+            print(user in db.session)
+            return render_template('profile_settings.html', user=user)
         except Exception as e:
             flash(f"Error updating profile: {e}")
+            db.session.rollback()
         return redirect(url_for('home'))
-
+        
+    
     return render_template('profile_settings.html', user=user)
 
 
