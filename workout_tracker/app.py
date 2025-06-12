@@ -159,59 +159,27 @@ def profile_settings():
     user = User.query.get(session['user_id'])
 
     if request.method == 'POST':
-        # Password update
-        new_password = request.form.get('new_password')
-        confirm_password = request.form.get('confirm_password')
-
-        if new_password and confirm_password:
-            if new_password == confirm_password:
-                if len(new_password) >= 6:
-                    user.password_hash = generate_password_hash(new_password)
-                else:
-                    flash("Password must be at least 6 characters.")
-            else:
-                flash("Passwords do not match.")
-
-        # Goal updates with safe parsing
-        def try_parse_float(field):  # Safe float parsing
-            try:
-                return float(request.form.get(field))
-            except (TypeError, ValueError):
-                return None
-
-        user.bench_goal = try_parse_float('bench_goal')
-        user.squat_goal = try_parse_float('squat_goal')
-        user.deadlift_goal = try_parse_float('deadlift_goal')
-        user.current_weight = try_parse_float('current_weight')
-        user.goal_weight = try_parse_float('goal_weight')
-        user.bench_current = try_parse_float('bench_current')
-        user.squat_current = try_parse_float('squat_current')
-        user.deadlift_current = try_parse_float('deadlift_current')
-
-
-        if user.current_weight and user.goal_weight:
+        try:
+            # Save weight fields
+            user.current_weight = float(request.form['current_weight'])
+            user.goal_weight = float(request.form['goal_weight'])
             user.weight_updated = datetime.now().strftime('%Y-%m-%d %H:%M')
 
-        db.session.commit()
-        flash("Profile updated successfully.")
-        return redirect(url_for('profile_settings'))
-    for field in ['current_weight', 'goal_weight', 'bench_goal', 'squat_goal', 'deadlift_goal',
-              'bench_current', 'squat_current', 'deadlift_current']:
-        val = request.form.get(field)
-        if val:
-            try:
-                parsed = float(val)
-                if parsed < 0 or parsed > 500:
-                    flash(f"{field.replace('_', ' ').title()} must be between 0–500.")
-                    return redirect(url_for('profile_settings'))
-                setattr(user, field, parsed)
-            except ValueError:
-                flash(f"{field.replace('_', ' ').title()} must be a number.")
-                return redirect(url_for('profile_settings'))
+            # Save lift goals (optional if they exist in form)
+            user.bench_current = float(request.form.get('bench_current', 0))
+            user.bench_goal = float(request.form.get('bench_goal', 0))
+            user.squat_current = float(request.form.get('squat_current', 0))
+            user.squat_goal = float(request.form.get('squat_goal', 0))
+            user.deadlift_current = float(request.form.get('deadlift_current', 0))
+            user.deadlift_goal = float(request.form.get('deadlift_goal', 0))
 
+            db.session.commit()
+            flash("Profile updated successfully!")
+        except Exception as e:
+            flash(f"Error updating profile: {e}")
+        return redirect(url_for('home'))
 
     return render_template('profile_settings.html', user=user)
-
 
 
 

@@ -58,14 +58,13 @@
             background: #ccc;
             height: 20px;
             border-radius: 5px;
-          /*  overflow: hidden;*/
             margin-bottom: 20px;
+            overflow: hidden;
         }
         .progress-fill {
             height: 100%;
         }
     </style>
-
 </head>
 <body>
 <div class="center">
@@ -81,45 +80,51 @@
     </div>
 
     <div class="goals-info">
-
-        <!-- Body Weight -->
+        <!-- 🟦 Body Weight Progress -->
         {% if user.current_weight and user.goal_weight %}
-          <p><strong>Body Weight:</strong> {{ user.current_weight }} / {{ user.goal_weight }} kg</p>
-          {% set weight_progress = (user.goal_weight / user.current_weight * 100) if user.goal_weight < user.current_weight else (user.current_weight / user.goal_weight * 100) %}
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: {{ weight_progress | round(1) }}%; background: {% if user.goal_weight < user.current_weight %}#ff5722{% else %}#4caf50{% endif %};"></div>
-          </div>
-          <p>Progress: {{ weight_progress | round(1) }}%</p>
+            <p><strong>Body Weight:</strong> {{ user.current_weight }} / {{ user.goal_weight }} kg</p>
+            {% if user.goal_weight < user.current_weight %}
+                {% set weight_progress = (user.goal_weight / user.current_weight) * 100 %}
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ weight_progress | round(1) }}%; background: #ff5722;"></div>
+                </div>
+            {% else %}
+                {% set weight_progress = (user.current_weight / user.goal_weight) * 100 %}
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ weight_progress | round(1) }}%; background: #4caf50;"></div>
+                </div>
+            {% endif %}
+            <p>Progress: {{ weight_progress | round(1) }}%</p>
         {% endif %}
 
-        <!-- Bench -->
+        <!-- 🟩 Bench Press -->
         {% if user.bench_current and user.bench_goal %}
-          <p><strong>Bench Press:</strong> {{ user.bench_current }} / {{ user.bench_goal }} kg</p>
-          {% set bench_pct = (user.bench_current / user.bench_goal * 100) %}
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: {{ bench_pct | round(1) }}%; background: #4CAF50;"></div>
-          </div>
-          <p>Progress: {{ bench_pct | round(1) }}%</p>
+            <p><strong>Bench Press:</strong> {{ user.bench_current }} / {{ user.bench_goal }} kg</p>
+            {% set bench_pct = (user.bench_current / user.bench_goal * 100) %}
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ bench_pct | round(1) }}%; background: #4CAF50;"></div>
+            </div>
+            <p>Progress: {{ bench_pct | round(1) }}%</p>
         {% endif %}
 
-        <!-- Squat -->
+        <!-- 🟧 Squat -->
         {% if user.squat_current and user.squat_goal %}
-          <p><strong>Squat:</strong> {{ user.squat_current }} / {{ user.squat_goal }} kg</p>
-          {% set squat_pct = (user.squat_current / user.squat_goal * 100) %}
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: {{ squat_pct | round(1) }}%; background: #FF9800;"></div>
-          </div>
-          <p>Progress: {{ squat_pct | round(1) }}%</p>
+            <p><strong>Squat:</strong> {{ user.squat_current }} / {{ user.squat_goal }} kg</p>
+            {% set squat_pct = (user.squat_current / user.squat_goal * 100) %}
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ squat_pct | round(1) }}%; background: #FF9800;"></div>
+            </div>
+            <p>Progress: {{ squat_pct | round(1) }}%</p>
         {% endif %}
 
-        <!-- Deadlift -->
+        <!-- 🟥 Deadlift -->
         {% if user.deadlift_current and user.deadlift_goal %}
-          <p><strong>Deadlift:</strong> {{ user.deadlift_current }} / {{ user.deadlift_goal }} kg</p>
-          {% set dl_pct = (user.deadlift_current / user.deadlift_goal * 100) %}
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: {{ dl_pct | round(1) }}%; background: #F44336;"></div>
-          </div>
-          <p>Progress: {{ dl_pct | round(1) }}%</p>
+            <p><strong>Deadlift:</strong> {{ user.deadlift_current }} / {{ user.deadlift_goal }} kg</p>
+            {% set dl_pct = (user.deadlift_current / user.deadlift_goal * 100) %}
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ dl_pct | round(1) }}%; background: #F44336;"></div>
+            </div>
+            <p>Progress: {{ dl_pct | round(1) }}%</p>
         {% endif %}
     </div>
 
