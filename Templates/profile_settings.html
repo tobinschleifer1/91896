@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Profile Settings</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main_styles.css') }}">
+    <script> function confirmUpdate() {return confirm('Are you sure you want to update your profile?');}
+    </script>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
             background-color: #f2f2f2;
             margin: 0;
-            <script> function confirmUpdate() {return confirm('Are you sure you want to update your profile?');}
-</script>
+
 
         }
         .top-nav {
@@ -85,6 +86,12 @@
         <!-- Deadlift -->
         <input type="number" name="deadlift_current" value="{{ user.deadlift_current or '' }}" placeholder="Current Deadlift (kg)">
         <input type="number" name="deadlift_goal" value="{{ user.deadlift_goal or '' }}" placeholder="Deadlift Goal (kg)">
+
+        <h2>Body Weight Goals</h2>
+        <label>Current Weight (kg):</label>
+        <input type="number" name="current_weight" step="0.1" required><br><br>
+        <label>Goal Weight (kg):</label>
+        <input type="number" name="goal_weight" step="0.1" required><br><br>
 
         <button type="submit">Update Profile</button>
 
