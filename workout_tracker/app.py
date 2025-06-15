@@ -157,36 +157,55 @@ def profile_settings():
         return redirect(url_for('login'))
 
     user = User.query.get(session['user_id'])
-    print(user)
 
     if request.method == 'POST':
         try:
-            # Save weight fields
-            user.current_weight = float(request.form['current_weight'])
-            print("before", request.form['current_weight'])
-            user.goal_weight = float(request.form['goal_weight'])
+            # Weight goals
+            if request.form.get('current_weight'):
+                user.current_weight = float(request.form['current_weight'])
+            if request.form.get('goal_weight'):
+                user.goal_weight = float(request.form['goal_weight'])
             user.weight_updated = datetime.now().strftime('%Y-%m-%d %H:%M')
 
-            # Save lift goals (optional if they exist in form)
-            user.bench_current = float(request.form.get('bench_current', 0))
-            user.bench_goal = float(request.form.get('bench_goal', 0))
-            user.squat_current = float(request.form.get('squat_current', 0))
-            user.squat_goal = float(request.form.get('squat_goal', 0))
-            user.deadlift_current = float(request.form.get('deadlift_current', 0))
-            user.deadlift_goal = float(request.form.get('deadlift_goal', 0))
+            # Lift goals
+            if request.form.get('bench_current'):
+                user.bench_current = int(request.form['bench_current'])
+            if request.form.get('bench_goal'):
+                user.bench_goal = int(request.form['bench_goal'])
+
+            if request.form.get('squat_current'):
+                user.squat_current = int(request.form['squat_current'])
+            if request.form.get('squat_goal'):
+                user.squat_goal = int(request.form['squat_goal'])
+
+            if request.form.get('deadlift_current'):
+                user.deadlift_current = int(request.form['deadlift_current'])
+            if request.form.get('deadlift_goal'):
+                user.deadlift_goal = int(request.form['deadlift_goal'])
+
+            # Password update
+            new_pass = request.form.get('new_password')
+            confirm_pass = request.form.get('confirm_password')
+            if new_pass or confirm_pass:
+                if new_pass != confirm_pass:
+                    flash("Passwords do not match.")
+                    return redirect(url_for('profile_settings'))
+                if len(new_pass) < 6:
+                    flash("Password must be at least 6 characters.")
+                    return redirect(url_for('profile_settings'))
+                user.password_hash = generate_password_hash(new_pass)
 
             db.session.commit()
             flash("Profile updated successfully!")
-            print("after", request.form['current_weight'])
-            print(user in db.session)
-            return render_template('profile_settings.html', user=user)
+
         except Exception as e:
-            flash(f"Error updating profile: {e}")
-            db.session.rollback()
+            flash(f"Error updating profile: {str(e)}")
+
         return redirect(url_for('home'))
-        
-    
+
     return render_template('profile_settings.html', user=user)
+
+
 
 
 

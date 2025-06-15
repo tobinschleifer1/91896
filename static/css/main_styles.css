@@ -115,3 +115,115 @@ input:focus, select:focus, textarea:focus {
     background: linear-gradient(90deg, #8f94fb 0%, #4e54c8 100%);
     transform: translateY(-2px) scale(1.03);
 }
+
+        .workout-entry {
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: #f7f7f7;
+            padding: 10px;
+        }
+        .workout-header {
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+        .workout-details {
+            display: none;
+            margin-top: 10px;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .top-bar a {
+            padding: 8px 16px;
+            text-decoration: none;
+            background-color: #2691d9;
+            color: white;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+        .top-bar a:hover {
+            background-color: #1b7cb2;
+        }
+        .profile-icon {
+            margin-right: auto;
+            padding: 10px;
+        }
+        .profile-icon a {
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: #2691d9;
+        }
+        .goals-info {
+            margin: 20px 0;
+            padding: 15px;
+            background: #eef;
+            border-radius: 6px;
+        }
+        .progress-bar {
+            background: #ccc;
+            height: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+        }
+  body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+
+
+        }
+        .top-nav {
+            background-color: #2691d9;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .top-nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .container h2 {
+            color: #2691d9;
+            margin-bottom: 15px;
+        }
+        .container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .container button {
+            background: #2691d9;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .container button:hover {
+            background: #1b7cb2;
+        }
+        .messages {
+            color: red;
+        }
+  

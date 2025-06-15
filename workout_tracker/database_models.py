@@ -18,6 +18,9 @@ class User(db.Model):
     deadlift_current = db.Column(db.Integer)
     recovery_phrase = db.Column(db.Text)
     weight_updated = db.Column(db.String)
+    current_weight = db.Column(db.Float)
+    goal_weight = db.Column(db.Float)
+
 
 
 
