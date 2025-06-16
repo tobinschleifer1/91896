@@ -2,7 +2,7 @@
 import os
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database_models import db, User, UserExercise
+from database_models import db, User, UserExercise, WorkoutExercise
 from werkzeug.security import generate_password_hash, check_password_hash
 
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -78,20 +78,6 @@ def home():
 
     user = User.query.get(session['user_id'])
 
-    workouts = (
-        UserExercise.query
-        .filter_by(user_id=user.ID)
-        .order_by(UserExercise.date_completed.desc())
-        .all()
-    )
-
-    grouped = {}
-    for w in workouts:
-        key = w.date_completed
-        grouped.setdefault(key, {"exercises": [], "meta": w})["exercises"].append(w.exercise)
-
-    from database_models import WorkoutExercise
-
     logs = (
         UserExercise.query
         .filter_by(user_id=user.ID)
@@ -101,11 +87,11 @@ def home():
 
     grouped = {}
     for log in logs:
+        exercises = WorkoutExercise.query.filter_by(user_exercise_id=log.ID).all()
         grouped[log.date_completed] = {
             "meta": log,
-            "exercises": WorkoutExercise.query.filter_by(user_exercise_id=log.ID).all()
+            "exercises": exercises
         }
-
 
     return render_template('home_page.html', user=user, grouped_workouts=grouped)
 
@@ -140,8 +126,6 @@ def log_workout():
                 flash("Each weight must be between 1 and 500.")
                 return redirect(url_for('log_workout'))
 
-            from database_models import WorkoutExercise  # 👈 Import here to avoid circular issues
-
             log = UserExercise(
                 user_id=user_id,
                 duration=duration,
@@ -151,7 +135,7 @@ def log_workout():
                 notes=notes
             )
             db.session.add(log)
-            db.session.flush()  # get log.ID
+            db.session.flush()
 
             for i in range(len(exercise_names)):
                 exercise = WorkoutExercise(
@@ -173,8 +157,6 @@ def log_workout():
             return redirect(url_for('log_workout'))
 
     return render_template('log_workout.html')
-
-
 
 @app.route('/profile_settings', methods=['GET', 'POST'])
 def profile_settings():
@@ -229,10 +211,6 @@ def profile_settings():
         return redirect(url_for('home'))
 
     return render_template('profile_settings.html', user=user)
-
-
-
-
 
 @app.route('/profile_setup', methods=['GET', 'POST'])
 def profile_setup():

@@ -82,10 +82,11 @@
                     Calories: {{ block.meta.calories_burned }}</p>
                     <ul>
                     {% for ex in block.exercises %}
-                        <li>{{ ex.name }} - {{ ex.sets }} sets x {{ ex.reps }} reps @ {{ ex.weight }} {{ ex.unit }}</li>
+                    <li>
+                        {{ ex.name }}: {{ ex.sets }} sets × {{ ex.reps }} reps @ {{ ex.weight }} {{ ex.unit }}
+                    </li>
                     {% endfor %}
                     </ul>
-
 
                 {% if block.meta.notes %}
                     <p><strong>Notes:</strong> {{ block.meta.notes }}</p>
