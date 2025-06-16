@@ -28,12 +28,24 @@ class UserExercise(db.Model):
     __tablename__ = 'UserExercises'
     ID = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
-    exercise = db.Column(db.String, nullable=False)  # 🔄 was exercise_id
     duration = db.Column(db.Integer)
     intensity = db.Column(db.Integer)
-    date_completed = db.Column(db.Integer)
     calories_burned = db.Column(db.Integer)
-    notes = db.Column(db.Text)  # Add this line inside the class
+    notes = db.Column(db.Text)
+    date_completed = db.Column(db.Integer)
+    # one-to-many relationship
+    exercises = db.relationship('WorkoutExercise', backref='parent', lazy=True)
+
+
+class WorkoutExercise(db.Model):
+    __tablename__ = 'WorkoutExercises'
+    ID = db.Column(db.Integer, primary_key=True)
+    user_exercise_id = db.Column(db.Integer, db.ForeignKey('UserExercises.ID'))
+    name = db.Column(db.String)
+    sets = db.Column(db.Integer)
+    reps = db.Column(db.Integer)
+    weight = db.Column(db.Float)
+    unit = db.Column(db.String)
 
 
 

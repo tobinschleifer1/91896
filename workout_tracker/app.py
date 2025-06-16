@@ -90,6 +90,23 @@ def home():
         key = w.date_completed
         grouped.setdefault(key, {"exercises": [], "meta": w})["exercises"].append(w.exercise)
 
+    from database_models import WorkoutExercise
+
+    logs = (
+        UserExercise.query
+        .filter_by(user_id=user.ID)
+        .order_by(UserExercise.date_completed.desc())
+        .all()
+    )
+
+    grouped = {}
+    for log in logs:
+        grouped[log.date_completed] = {
+            "meta": log,
+            "exercises": WorkoutExercise.query.filter_by(user_exercise_id=log.ID).all()
+        }
+
+
     return render_template('home_page.html', user=user, grouped_workouts=grouped)
 
 @app.route('/logout')
@@ -115,40 +132,48 @@ def log_workout():
             notes = request.form['notes']
             timestamp = int(datetime.now().timestamp())
 
-            # 🛑 Basic validation
             if not (1 <= duration <= 300):
                 flash("Workout duration must be between 1 and 300 minutes.")
                 return redirect(url_for('log_workout'))
+
             if not all(1 <= w <= 500 for w in weights):
-                flash("Weight per exercise must be between 1 and 500.")
+                flash("Each weight must be between 1 and 500.")
                 return redirect(url_for('log_workout'))
 
-            for i in range(len(exercise_names)):
-                name = exercise_names[i]
-                weight_str = f"{weights[i]} {weight_units[i]}"
-                full_name = f"{name} ({weight_str})"
-                total_calories = intensity * duration
+            from database_models import WorkoutExercise  # 👈 Import here to avoid circular issues
 
-                log = UserExercise(
-                    user_id=user_id,
-                    exercise=full_name,
-                    duration=duration,
-                    intensity=intensity,
-                    date_completed=timestamp,
-                    calories_burned=total_calories,
-                    notes=notes
+            log = UserExercise(
+                user_id=user_id,
+                duration=duration,
+                intensity=intensity,
+                date_completed=timestamp,
+                calories_burned=intensity * duration,
+                notes=notes
+            )
+            db.session.add(log)
+            db.session.flush()  # get log.ID
+
+            for i in range(len(exercise_names)):
+                exercise = WorkoutExercise(
+                    user_exercise_id=log.ID,
+                    name=exercise_names[i],
+                    sets=sets[i],
+                    reps=reps[i],
+                    weight=weights[i],
+                    unit=weight_units[i]
                 )
-                db.session.add(log)
+                db.session.add(exercise)
 
             db.session.commit()
             flash("Workout logged successfully!")
             return redirect(url_for('home'))
 
         except Exception as e:
-            flash(f"Error logging workout: {str(e)}")
+            flash(f"Error: {str(e)}")
             return redirect(url_for('log_workout'))
 
     return render_template('log_workout.html')
+
 
 
 @app.route('/profile_settings', methods=['GET', 'POST'])
