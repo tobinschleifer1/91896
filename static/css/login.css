@@ -98,3 +98,12 @@ text-decoration: none;
 .users_signup a:hover{
 text-decoration: underline;
 }
+.forgot a {
+    color: #2691d9; /* same light blue as other links */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.forgot a:hover {
+    text-decoration: underline;
+}
