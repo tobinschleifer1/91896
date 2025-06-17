@@ -11,13 +11,13 @@
 
     <form method="POST">
         <div class="txt_field">
-            <input type="text" name="username" required>
+            <input type="text" name="username" required  minlength="3" maxlength="30">
             <label>Username</label>
             <span></span>
         </div>
 
         <div class="txt_field">
-            <input type="password" name="password" required minlength="6">
+            <input type="password" name="password" required minlength="6"  maxlength="30">
             <label>Password</label>
             <span></span>
         </div>
@@ -29,7 +29,7 @@
         </div>
 
         <div class="txt_field">
-            <input type="text" name="recovery_phrase" required>
+            <input type="text" name="recovery_phrase" required  minlength="3" maxlength="30">
             <label>Recovery Phrase (used if password is lost)</label>
             <span></span>
         </div>
