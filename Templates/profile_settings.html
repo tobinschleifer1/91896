@@ -16,37 +16,37 @@
 
 <div class="container">
     <form method="POST">
+        <!-- Password section -->
         <h2>Change Password</h2>
-        <input type="password" name="new_password" placeholder="New Password">
-        <input type="password" name="confirm_password" placeholder="Confirm Password">
+        <input type="password" name="new_password" placeholder="New Password" maxlength="30">
+        <input type="password" name="confirm_password" placeholder="Confirm Password" maxlength="30">
 
         <h2>Set Workout Goals</h2>
 
         <!-- Bench -->
         <label>Current bench (kg):</label>
-        <input type="number" name="bench_current" value="{{ user.bench_current or '' }}" placeholder="Current Bench Press (kg)">
+        <input type="number" name="bench_current" value="{{ user.bench_current or '' }}" min="0" max="500" placeholder="Current Bench Press (kg)">
         <label>Goal bench (kg):</label>
-        <input type="number" name="bench_goal" value="{{ user.bench_goal or '' }}" placeholder="Bench Press Goal (kg)">
+        <input type="number" name="bench_goal" value="{{ user.bench_goal or '' }}" min="0" max="500" placeholder="Bench Press Goal (kg)">
 
         <!-- Squat -->
         <label>Current squat (kg):</label>
-        <input type="number" name="squat_current" value="{{ user.squat_current or '' }}" placeholder="Current Squat (kg)">
+        <input type="number" name="squat_current" value="{{ user.squat_current or '' }}" min="0" max="500" placeholder="Current Squat (kg)">
         <label>Squat goal (kg):</label>
-        <input type="number" name="squat_goal" value="{{ user.squat_goal or '' }}" placeholder="Squat Goal (kg)">
+        <input type="number" name="squat_goal" value="{{ user.squat_goal or '' }}" min="0" max="500" placeholder="Squat Goal (kg)">
 
         <!-- Deadlift -->
         <label>Current deadlift (kg):</label>
-        <input type="number" name="deadlift_current" value="{{ user.deadlift_current or '' }}" placeholder="Current Deadlift (kg)">
+        <input type="number" name="deadlift_current" value="{{ user.deadlift_current or '' }}" min="0" max="500" placeholder="Current Deadlift (kg)">
         <label>Deadlift goal (kg):</label>
-        <input type="number" name="deadlift_goal" value="{{ user.deadlift_goal or '' }}" placeholder="Deadlift Goal (kg)">
+        <input type="number" name="deadlift_goal" value="{{ user.deadlift_goal or '' }}" min="0" max="500" placeholder="Deadlift Goal (kg)">
 
-       <h2>Body Weight Goals</h2>
+        <h2>Body Weight Goals</h2>
+        <label>Current Weight (kg):</label>
+        <input type="number" name="current_weight" step="0.1" min="0" max="500" value="{{ user.current_weight or '' }}" placeholder="Enter your current weight">
 
-<label>Current Weight (kg):</label>
-<input type="number" name="current_weight" step="0.1" value="{{ user.current_weight or '' }}" placeholder="Enter your current weight" required>
-
-<label>Goal Weight (kg):</label>
-<input type="number" name="goal_weight" step="0.1" value="{{ user.goal_weight or '' }}" placeholder="Enter your goal weight" required>
+        <label>Goal Weight (kg):</label>
+        <input type="number" name="goal_weight" step="0.1" min="0" max="500" value="{{ user.goal_weight or '' }}" placeholder="Enter your goal weight">
 
 {% if user.weight_updated %}
   <p><em>Last updated: {{ user.weight_updated }}</em></p>
