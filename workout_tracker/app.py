@@ -40,6 +40,30 @@ def login():
             flash('Invalid username or password')
     return render_template('login_page.html')
 
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        recovery_phrase = request.form.get('recovery_phrase', '').strip()
+
+        if not username or not recovery_phrase:
+            flash('Please enter both username and recovery phrase.')
+            return redirect(url_for('forgot_password'))
+
+        user = User.query.filter_by(Username=username).first()
+
+        if user and user.recovery_phrase == recovery_phrase:
+            session['user_id'] = user.ID
+            flash('Logged in using recovery phrase.')
+            return redirect(url_for('home'))
+        else:
+            flash('Invalid username or recovery phrase.')
+            return redirect(url_for('forgot_password'))
+
+    return render_template('forgot_password.html')
+
+
+
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
     if request.method == 'POST':
@@ -118,9 +142,19 @@ def log_workout():
             notes = request.form['notes']
             timestamp = int(datetime.now().timestamp())
 
+            # Length validations
+            if any(len(name) > 50 for name in exercise_names):
+                flash("Each exercise name must be under 50 characters.")
+                return redirect(url_for('log_workout'))
+            
+            if len(notes) > 200:
+                flash("Notes must be under 200 characters.")
+                return redirect(url_for('log_workout'))
+
             if not (1 <= duration <= 300):
                 flash("Workout duration must be between 1 and 300 minutes.")
                 return redirect(url_for('log_workout'))
+            
 
             if not all(1 <= w <= 500 for w in weights):
                 flash("Each weight must be between 1 and 500.")
